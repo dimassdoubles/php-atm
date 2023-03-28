@@ -67,7 +67,7 @@ class Processor
         if ($success) {
             echo "Berhasil";
             $this->transactionRepo->add(
-                new Transaction($this->card->getCardNumber(), date("Y-m-d, H:i:s") . " | TopUp sebesar " . number_format($currentBalance, 0, ",", "."))
+                new Transaction($this->card->getCardNumber(), date("Y-m-d, H:i:s") . " | TopUp sebesar " . number_format($amount, 0, ",", "."))
             );
         } else {
             echo "Gagal";
@@ -92,6 +92,9 @@ class ATMProcessor extends Processor
     public function __construct(CardRepo $cardRepo, TransactionRepo $transactionRepo)
     {
         parent::__construct($cardRepo, $transactionRepo);
+        $this->withdraw(100000);
+        $this->printInfo();
+        $this->printMutation();
     }
 
     public function printInfo()
@@ -100,6 +103,25 @@ class ATMProcessor extends Processor
         echo "Pemilik     : " . $this->card->getOwner() . "\n";
         echo "Nomor Rek   : " . $this->card->getAccountNumber() . "\n";
         echo "Bank        : " . $this->card->getBank() . "\n";
+    }
+
+    public function withdraw(float $amount)
+    {
+        echo "\n";
+        echo "Tarik Tunai\n";
+        echo "-----------\n";
+
+        if ($amount < $this->card->getBalance()) {
+            $success = $this->card->setBalance($this->card->getBalance() - $amount);
+            if ($success) {
+                echo "\nBerhasil\n";
+                $this->transactionRepo->add(
+                    new Transaction($this->card->getCardNumber(), date("Y-m-d, H:i:s") . " | Tarik tunai sebesar " . number_format($amount, 0, ",", "."))
+                );
+            }
+        } else {
+            echo "\nGagal\n";
+        }
     }
 }
 
