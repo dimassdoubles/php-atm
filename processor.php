@@ -6,11 +6,11 @@ include 'transaction_repo.php';
 
 class Processor
 {
-    private $cardRepo;
-    private $transactionRepo;
+    protected $cardRepo;
+    protected $transactionRepo;
 
-    private $card;
-    private $authenticated;
+    protected $card;
+    protected $authenticated;
 
     public function __construct(CardRepo $cardRepo, TransactionRepo $transactionRepo)
     {
@@ -56,7 +56,7 @@ class Processor
         echo "Informasi Kartu\n";
         echo "---------------\n";
         echo "Nomor Kartu : " . $this->card->getCardNumber() . "\n";
-        echo "Saldo       : " . number_format($this->card->getBalance(), 0, ",", ".");
+        echo "Saldo       : " . number_format($this->card->getBalance(), 0, ",", ".") . "\n";
     }
 
     public function topUp(float $amount)
@@ -87,6 +87,22 @@ class Processor
     }
 }
 
+class ATMProcessor extends Processor
+{
+    public function __construct(CardRepo $cardRepo, TransactionRepo $transactionRepo)
+    {
+        parent::__construct($cardRepo, $transactionRepo);
+    }
+
+    public function printInfo()
+    {
+        parent::printInfo();
+        echo "Pemilik     : " . $this->card->getOwner() . "\n";
+        echo "Nomor Rek   : " . $this->card->getAccountNumber() . "\n";
+        echo "Bank        : " . $this->card->getBank() . "\n";
+    }
+}
+
 
 $transactionRepo = new TransactionRepo();
 $listCard = array();
@@ -96,6 +112,6 @@ $listCard[] = new ATM("2222222222", "222222", 250000, "Widjanarko", "22222", "BC
 
 $cardRepo = new CardRepo($listCard);
 
-$processor = new Processor($cardRepo, $transactionRepo);
+$processor = new ATMProcessor($cardRepo, $transactionRepo);
 
 // $card = $cardRepo->whereCardNumber("1111111111");
