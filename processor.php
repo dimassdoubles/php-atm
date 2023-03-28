@@ -85,6 +85,27 @@ class Processor
             echo "\n";
         }
     }
+
+    public function payment(float $amount)
+    {
+        echo "\n";
+        echo "Pembayaran Belanja\n";
+        echo "------------------\n";
+
+        if ($this->card->getBalance() > $amount) {
+            $success = $this->card->setBalance($this->card->getBalance() - $amount);
+            if ($success) {
+                echo "\nBerhasil";
+                $this->transactionRepo->add(
+                    new Transaction($this->card->getCardNumber, date("Y-m-d, H:i:s") . " | Pembaran belanja sebesar " . number_format($amount, 0, ",", ".")),
+                );
+            } else {
+                echo "\nGagal\n";
+            }
+        } else {
+            echo "\nGagal\n";
+        }
+    }
 }
 
 class ATMProcessor extends Processor
